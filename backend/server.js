@@ -1,23 +1,25 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const mysql = require("mysql2");
+const { PORT, DB_HOST, DB_USER, DB_PASS, DB_NAME } = require("./config");
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Database connection (RDS)
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "your-rds-endpoint.amazonaws.com",
-  user: process.env.DB_USER || "admin",
-  password: process.env.DB_PASS || "password123",
-  database: process.env.DB_NAME || "userdb"
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASS,
+  database: DB_NAME,
 });
 
 db.connect(err => {
-  if (err) console.error("❌ DB connection failed:", err);
-  else console.log("✅ Connected to MySQL");
+  if (err) {
+    console.error("❌ Database connection failed:", err);
+    process.exit(1);
+  }
+  console.log("✅ Connected to MySQL RDS");
 });
 
 app.get("/api/users", (req, res) => {
@@ -29,11 +31,10 @@ app.get("/api/users", (req, res) => {
 
 app.post("/api/users", (req, res) => {
   const { name, email } = req.body;
-  if (!name || !email) return res.status(400).json({ error: "Missing name/email" });
-  db.query("INSERT INTO users (name, email) VALUES (?, ?)", [name, email], (err, result) => {
+  db.query("INSERT INTO users (name, email) VALUES (?, ?)", [name, email], err => {
     if (err) return res.status(500).json({ error: err });
-    res.json({ message: "User added", id: result.insertId });
+    res.json({ message: "User added successfully" });
   });
 });
 
-app.listen(4000, () => console.log("Backend running on port 4000"));
+app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));

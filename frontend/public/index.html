@@ -1,53 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>3-Tier User App</title>
-    <style>
-      body { font-family: Arial; background: #f4f4f4; padding: 30px; }
-      h1 { color: #333; }
-      input { margin: 5px; padding: 8px; }
-      button { padding: 8px 16px; background: #0078ff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-      table { border-collapse: collapse; margin-top: 20px; width: 50%; background: white; }
-      td, th { border: 1px solid #ddd; padding: 10px; text-align: left; }
-    </style>
+    <title>User Management</title>
   </head>
   <body>
-    <h1>User Management App</h1>
-    <div>
-      <input id="name" placeholder="Name" />
-      <input id="email" placeholder="Email" />
-      <button onclick="addUser()">Add User</button>
-    </div>
-    <h3>All Users:</h3>
-    <table id="usersTable">
-      <tr><th>ID</th><th>Name</th><th>Email</th></tr>
-    </table>
+    <h1>User Management</h1>
+    <form id="userForm">
+      <input type="text" id="name" placeholder="Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <button type="submit">Add User</button>
+    </form>
+    <h2>All Users</h2>
+    <ul id="userList"></ul>
 
-    <script>
-      async function fetchUsers() {
-        const res = await fetch("/api/users");
-        const users = await res.json();
-        const table = document.getElementById("usersTable");
-        table.innerHTML = "<tr><th>ID</th><th>Name</th><th>Email</th></tr>";
-        users.forEach(u => {
-          table.innerHTML += `<tr><td>${u.id}</td><td>${u.name}</td><td>${u.email}</td></tr>`;
-        });
-      }
-
-      async function addUser() {
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        await fetch("/api/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email })
-        });
-        document.getElementById("name").value = "";
-        document.getElementById("email").value = "";
-        fetchUsers();
-      }
-
-      fetchUsers();
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
